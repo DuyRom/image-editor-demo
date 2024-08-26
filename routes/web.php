@@ -17,7 +17,7 @@ use App\Http\Controllers\ContractController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('captures/create');
 });
 
 Route::get('/letter', Letter::class)->name('letter');
@@ -26,7 +26,7 @@ Route::get('/create-contract', [ContractController::class,'showCreateContractVie
 
 Route::post('/contracts/create', [ContractController::class,'createAndSaveContract'])->name('create-contract');
 
-Route::view('/captures/create', '/captures/create');
+// Route::view('/captures/create', '/captures/create');
 
 Route::post('/upload', [UploadController::class, 'upload']);
 
