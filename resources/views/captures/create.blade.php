@@ -41,9 +41,8 @@
                     </div>
                     <div class="mt-3">
                         <input type="color" id="colorInput" class="form-control mt-2">
-                        <button id="addTextButton" class="btn btn-primary mt-2">Add Text</button>
-                        <button id="editTextButton" class="btn btn-secondary mt-2">Edit Text</button>
-                        <button id="deleteTextButton" class="btn btn-danger mt-2">Delete Text</button>
+                        <button id="drawButton" class="btn btn-primary mt-2">Draw</button>
+                        <button id="eraseButton" class="btn btn-secondary mt-2">Erase</button>
                         <button id="cropButton" class="btn btn-secondary mt-2">Crop</button>
                     </div>
                 </div>
@@ -59,12 +58,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        let canvas, imageInstance, cropper, selectedText;
+        let canvas, imageInstance, cropper;
         const fileInput = document.getElementById('fileInput');
         const colorInput = document.getElementById('colorInput');
-        const addTextButton = document.getElementById('addTextButton');
-        const editTextButton = document.getElementById('editTextButton');
-        const deleteTextButton = document.getElementById('deleteTextButton');
+        const drawButton = document.getElementById('drawButton');
+        const eraseButton = document.getElementById('eraseButton');
         const cropButton = document.getElementById('cropButton');
         const saveButton = document.getElementById('saveButton');
         const imageModal = $('#imageModal');
@@ -85,21 +83,12 @@
                         canvas.clear();
                     } else {
                         canvas = new fabric.Canvas('imageCanvas');
-                        canvas.on('mouse:down', function(event) {
-                            if (event.target && event.target.type === 'i-text') {
-                                selectedText = event.target;
-                                colorInput.value = selectedText.fill;
-                            } else {
-                                selectedText = null;
-                                colorInput.value = '#000000';
-                            }
-                        });
                     }
                     fabric.Image.fromURL(e.target.result, (img) => {
                         imageInstance = img;
                         img.scaleToWidth(canvas.getWidth());
                         canvas.add(img);
-                        canvas.sendToBack(img); // Đảm bảo hình ảnh nằm dưới văn bản
+                        canvas.sendToBack(img); 
                         canvas.renderAll();
                     });
                 });
@@ -107,39 +96,21 @@
             reader.readAsDataURL(file);
         });
 
-        addTextButton.addEventListener('click', () => {
-            const text = new fabric.IText('Enter text here', {
-                left: 50,
-                top: 50,
-                fontSize: 30,
-                fill: colorInput.value
+        drawButton.addEventListener('click', () => {
+            canvas.isDrawingMode = true;
+            canvas.freeDrawingBrush.color = colorInput.value;
+            canvas.freeDrawingBrush.width = 5;
+        });
+
+        eraseButton.addEventListener('click', () => {
+            canvas.isDrawingMode = false;
+            canvas.selection = true;
+            canvas.forEachObject((obj) => {
+                if (obj !== imageInstance) {
+                    canvas.remove(obj);
+                }
             });
-            canvas.add(text);
-            canvas.setActiveObject(text);
-            text.enterEditing();
-            text.hiddenTextarea.focus(); // Đảm bảo textarea ẩn được focus để người dùng có thể gõ ngay lập tức
-            canvas.bringToFront(text); // Đảm bảo văn bản nằm trên hình ảnh
             canvas.renderAll();
-        });
-
-        editTextButton.addEventListener('click', () => {
-            if (selectedText) {
-                selectedText.fill = colorInput.value;
-                canvas.renderAll();
-            } else {
-                alert('Please select a text to edit.');
-            }
-        });
-
-        deleteTextButton.addEventListener('click', () => {
-            if (selectedText) {
-                canvas.remove(selectedText);
-                selectedText = null;
-                colorInput.value = '#000000';
-                canvas.renderAll();
-            } else {
-                alert('Please select a text to delete.');
-            }
         });
 
         cropButton.addEventListener('click', () => {
@@ -164,7 +135,7 @@
                         canvas.clear();
                         fabric.Image.fromURL(croppedDataUrl, (img) => {
                             canvas.add(img);
-                            canvas.sendToBack(img); // Đảm bảo hình ảnh nằm dưới văn bản
+                            canvas.sendToBack(img); 
                             canvas.renderAll();
                         });
                     }
