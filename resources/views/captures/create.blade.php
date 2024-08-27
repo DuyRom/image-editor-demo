@@ -13,14 +13,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         body, html {
-            height: 90%;
+            height: 100%;
             margin: 0;
             padding: 0;
         }
         #canvasContainer {
             position: relative;
             width: 100%;
-            height: 500px; /* Adjust height as needed */
+            height: calc(100% - 150px); /* Adjust height as needed */
             overflow: hidden;
         }
         #imageCanvas {
@@ -42,6 +42,21 @@
             max-width: 100%;
             max-height: 100%;
         }
+        .modal-full-height {
+            height: 100%;
+        }
+        .modal-dialog-full-height {
+            height: 100%;
+            margin: 0;
+            max-width: 100%;
+        }
+        .modal-content-full-height {
+            height: 100%;
+        }
+        .modal-body-full-height {
+            height: calc(100% - 120px); /* Adjust height as needed */
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -51,15 +66,15 @@
 
     <!-- Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
+        <div class="modal-dialog modal-lg modal-dialog-full-height" role="document">
+            <div class="modal-content modal-content-full-height">
                 <div class="modal-header">
                     <h5 class="modal-title" id="imageModalLabel">Edit Image</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body modal-body-full-height">
                     <div id="canvasContainer">
                         <canvas id="imageCanvas"></canvas>
                         <div id="cropContainer">
