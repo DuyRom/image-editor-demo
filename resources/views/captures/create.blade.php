@@ -49,6 +49,8 @@
                     </div>
                     <div class="mt-3">
                         <input type="color" id="colorInput" class="form-control mt-2">
+                        <label for="brushSizeInput" class="mt-2">Brush Size</label>
+                        <input type="range" id="brushSizeInput" class="form-control-range mt-2" min="1" max="50" value="5">
                         <button id="drawButton" class="btn btn-primary mt-2">
                             <i class="fas fa-pencil-alt"></i> Draw
                         </button>
@@ -80,6 +82,7 @@
         let canvas, imageInstance, cropper;
         const fileInput = document.getElementById('fileInput');
         const colorInput = document.getElementById('colorInput');
+        const brushSizeInput = document.getElementById('brushSizeInput');
         const drawButton = document.getElementById('drawButton');
         const eraseButton = document.getElementById('eraseButton');
         const cropButton = document.getElementById('cropButton');
@@ -129,17 +132,26 @@
         drawButton.addEventListener('click', () => {
             canvas.isDrawingMode = true;
             canvas.freeDrawingBrush.color = colorInput.value;
-            canvas.freeDrawingBrush.width = 5;
+            canvas.freeDrawingBrush.width = parseInt(brushSizeInput.value, 10);
+        });
+
+        colorInput.addEventListener('input', () => {
+            if (canvas.isDrawingMode) {
+                canvas.freeDrawingBrush.color = colorInput.value;
+            }
+        });
+
+        brushSizeInput.addEventListener('input', () => {
+            if (canvas.isDrawingMode) {
+                canvas.freeDrawingBrush.width = parseInt(brushSizeInput.value, 10);
+            }
         });
 
         eraseButton.addEventListener('click', () => {
             canvas.isDrawingMode = false;
             canvas.selection = true;
-            canvas.forEachObject((obj) => {
-                if (obj !== imageInstance) {
-                    canvas.remove(obj);
-                }
-            });
+            const objectsToRemove = canvas.getObjects().filter(obj => obj !== imageInstance);
+            objectsToRemove.forEach(obj => canvas.remove(obj));
             canvas.renderAll();
         });
 
@@ -158,13 +170,23 @@
                     aspectRatio: 1,
                     viewMode: 1,
                     ready() {
-                        const cropperCanvas = cropper.getCanvasData();
-                        canvas.setWidth(cropperCanvas.width);
-                        canvas.setHeight(cropperCanvas.height);
+                        const croppedCanvas = cropper.getCroppedCanvas();
+                        const croppedImageDataUrl = croppedCanvas.toDataURL();
+
+                        // Clear the existing canvas
                         canvas.clear();
-                        fabric.Image.fromURL(croppedDataUrl, (img) => {
+
+                        // Add the cropped image back to the Fabric.js canvas
+                        fabric.Image.fromURL(croppedImageDataUrl, (img) => {
+                            imageInstance = img;
+                            img.set({
+                                left: canvas.getWidth() / 2 - img.getScaledWidth() / 2,
+                                top: canvas.getHeight() / 2 - img.getScaledHeight() / 2,
+                                selectable: false,
+                                evented: false
+                            });
                             canvas.add(img);
-                            canvas.sendToBack(img); 
+                            canvas.sendToBack(img);
                             canvas.renderAll();
                         });
                     }
@@ -213,5 +235,4 @@
         });
     </script>
 </body>
-
 </html>
