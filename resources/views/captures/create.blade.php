@@ -13,7 +13,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         body, html {
-            height: 100%;
+            height: 90%;
             margin: 0;
             padding: 0;
         }
@@ -46,7 +46,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <input type="file" id="fileInput" accept="image/*" capture="camera" class="form-control">
+        <input type="file" id="fileInput" accept="image/*"  class="form-control">
     </div>
 
     <!-- Modal -->
