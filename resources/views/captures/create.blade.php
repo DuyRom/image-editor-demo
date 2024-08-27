@@ -6,17 +6,25 @@
     <title>Advanced Image Editor</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         #canvasContainer {
             position: relative;
+            width: 100%;
+            height: 500px; /* Adjust height as needed */
+            overflow: hidden;
         }
-        #textCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        #imageCanvas {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -41,9 +49,15 @@
                     </div>
                     <div class="mt-3">
                         <input type="color" id="colorInput" class="form-control mt-2">
-                        <button id="drawButton" class="btn btn-primary mt-2">Draw</button>
-                        <button id="eraseButton" class="btn btn-secondary mt-2">Erase</button>
-                        <button id="cropButton" class="btn btn-secondary mt-2">Crop</button>
+                        <button id="drawButton" class="btn btn-primary mt-2">
+                            <i class="fas fa-pencil-alt"></i> Draw
+                        </button>
+                        <button id="eraseButton" class="btn btn-secondary mt-2">
+                            <i class="fas fa-eraser"></i> Erase
+                        </button>
+                        <button id="cropButton" class="btn btn-secondary mt-2">
+                            <i class="fas fa-crop"></i> Crop
+                        </button>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -54,9 +68,14 @@
         </div>
     </div>
 
+    <!-- Hidden image element for Cropper.js -->
+    <img id="hiddenCropImage" style="display:none;" />
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script>
         let canvas, imageInstance, cropper;
         const fileInput = document.getElementById('fileInput');
@@ -67,6 +86,7 @@
         const saveButton = document.getElementById('saveButton');
         const imageModal = $('#imageModal');
         const imageCanvas = document.getElementById('imageCanvas');
+        const hiddenCropImage = document.getElementById('hiddenCropImage');
 
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -82,11 +102,21 @@
                     if (canvas) {
                         canvas.clear();
                     } else {
-                        canvas = new fabric.Canvas('imageCanvas');
+                        canvas = new fabric.Canvas('imageCanvas', {
+                            width: $('#canvasContainer').width(),
+                            height: $('#canvasContainer').height()
+                        });
                     }
                     fabric.Image.fromURL(e.target.result, (img) => {
                         imageInstance = img;
                         img.scaleToWidth(canvas.getWidth());
+                        img.scaleToHeight(canvas.getHeight());
+                        img.set({
+                            left: canvas.getWidth() / 2 - img.getScaledWidth() / 2,
+                            top: canvas.getHeight() / 2 - img.getScaledHeight() / 2,
+                            selectable: false,
+                            evented: false
+                        });
                         canvas.add(img);
                         canvas.sendToBack(img); 
                         canvas.renderAll();
@@ -122,10 +152,9 @@
                 quality: 1
             });
 
-            const cropImage = new Image();
-            cropImage.src = croppedDataUrl;
-            cropImage.onload = () => {
-                cropper = new Cropper(cropImage, {
+            hiddenCropImage.src = croppedDataUrl;
+            hiddenCropImage.onload = () => {
+                cropper = new Cropper(hiddenCropImage, {
                     aspectRatio: 1,
                     viewMode: 1,
                     ready() {
@@ -140,7 +169,6 @@
                         });
                     }
                 });
-                document.body.appendChild(cropImage);
             };
         });
 
@@ -185,4 +213,5 @@
         });
     </script>
 </body>
+
 </html>
