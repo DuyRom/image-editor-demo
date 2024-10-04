@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Letter;
@@ -17,7 +18,7 @@ use App\Http\Controllers\ContractController;
 */
 
 Route::get('/', function () {
-    return view('captures/create');
+    return view('pdfs/upload');
 });
 
 Route::get('/letter', Letter::class)->name('letter');
@@ -25,6 +26,8 @@ Route::get('/letter', Letter::class)->name('letter');
 Route::get('/create-contract', [ContractController::class,'showCreateContractView']);
 
 Route::post('/contracts/create', [ContractController::class,'createAndSaveContract'])->name('create-contract');
+
+
 
 // Route::view('/captures/create', '/captures/create');
 
@@ -37,4 +40,4 @@ Route::post('/upload', [UploadController::class, 'upload']);
 // Route::post('/contracts/create', [ContractController::class,'wordSave'])->name('word.save');
 
 
-// Route::get('/word/show',  [ContractController::class,'wordShow']);
+Route::post('/upload', [PdfController::class, 'uploadAndLock'])->name('upload.lock');

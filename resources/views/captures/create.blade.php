@@ -61,10 +61,8 @@
 </head>
 <body>
     <div class="container mt-5">
-        <input type="file" id="fileInput" accept="image/*"  class="form-control">
+        <input type="file" id="fileInput" class="form-control">
     </div>
-
-    <!-- Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-full-height" role="document">
             <div class="modal-content modal-content-full-height">
@@ -130,40 +128,41 @@
 
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
-            if (!file.type.startsWith('image/')) {
-                alert('Please upload an image file.');
-                return;
-            }
+            const fileType = file.type;
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageModal.modal('show');
-                imageModal.on('shown.bs.modal', () => {
-                    if (canvas) {
-                        canvas.clear();
-                    } else {
-                        canvas = new fabric.Canvas('imageCanvas', {
-                            width: $('#canvasContainer').width(),
-                            height: $('#canvasContainer').height()
+            if (fileType.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageModal.modal('show');
+                    imageModal.on('shown.bs.modal', () => {
+                        if (canvas) {
+                            canvas.clear();
+                        } else {
+                            canvas = new fabric.Canvas('imageCanvas', {
+                                width: $('#canvasContainer').width(),
+                                height: $('#canvasContainer').height()
+                            });
+                        }
+                        fabric.Image.fromURL(e.target.result, (img) => {
+                            imageInstance = img;
+                            img.scaleToWidth(canvas.getWidth());
+                            img.scaleToHeight(canvas.getHeight());
+                            img.set({
+                                left: canvas.getWidth() / 2 - img.getScaledWidth() / 2,
+                                top: canvas.getHeight() / 2 - img.getScaledHeight() / 2,
+                                selectable: false,
+                                evented: false
+                            });
+                            canvas.add(img);
+                            canvas.sendToBack(img); 
+                            canvas.renderAll();
                         });
-                    }
-                    fabric.Image.fromURL(e.target.result, (img) => {
-                        imageInstance = img;
-                        img.scaleToWidth(canvas.getWidth());
-                        img.scaleToHeight(canvas.getHeight());
-                        img.set({
-                            left: canvas.getWidth() / 2 - img.getScaledWidth() / 2,
-                            top: canvas.getHeight() / 2 - img.getScaledHeight() / 2,
-                            selectable: false,
-                            evented: false
-                        });
-                        canvas.add(img);
-                        canvas.sendToBack(img); 
-                        canvas.renderAll();
                     });
-                });
-            };
-            reader.readAsDataURL(file);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload an image file.');
+            }
         });
 
         drawButton.addEventListener('click', () => {
