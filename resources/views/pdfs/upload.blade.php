@@ -17,9 +17,8 @@
       <label for="pdf">Choose PDF to upload:</label>
       <input type="file" class="form-control" id="pdf" name="pdf" required>
     </div>
-    <div class="mb-3">
-      <label for="pwd">Password:</label>
-      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="owner_password">
+    <div class="row">
+      <label>Rermissions:</label>
     </div>
     <div class="form-check mb-3">
       <label class="form-check-label">
@@ -36,6 +35,10 @@
         <input class="form-check-input" type="checkbox" name="permissions[]" value="copy"> Copy
       </label>
     </div>
+    <div class="mb-3" id="gr-password">
+      <label for="pwd">Password:</label>
+      <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="owner_password">
+    </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
@@ -45,13 +48,20 @@
         const modifyCheckbox = document.getElementById('modify');
         const printCheckbox = document.getElementById('printCheckbox');
         const copyCheckbox = document.getElementById('copyCheckbox');
+        const passswordInput = document.getElementById('gr-password');
 
         if (modifyCheckbox.checked) {
-            printCheckbox.style.display = 'none';
-            copyCheckbox.style.display = 'none';
+            printCheckbox.querySelector('input').checked = true;
+            printCheckbox.querySelector('input').disabled = true;
+            copyCheckbox.querySelector('input').checked = true;
+            copyCheckbox.querySelector('input').disabled = true;
+            passswordInput.style.display = 'none';
         } else {
-            printCheckbox.style.display = 'block';
-            copyCheckbox.style.display = 'block';
+            printCheckbox.querySelector('input').checked = false;
+            printCheckbox.querySelector('input').disabled = false;
+            copyCheckbox.querySelector('input').checked = false;
+            copyCheckbox.querySelector('input').disabled = false;
+            passswordInput.style.display = 'block';
         }
     }
 </script>
