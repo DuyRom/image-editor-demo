@@ -65,11 +65,11 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "C:/xampp/htdocs/odb-pwa"
-        }
-    ]
+    "prefer-stable": true
+    // "repositories": [
+    //     {
+    //         "type": "path",
+    //         "url": "C:/xampp/htdocs/odb-pwa"
+    //     }
+    // ]
 }
